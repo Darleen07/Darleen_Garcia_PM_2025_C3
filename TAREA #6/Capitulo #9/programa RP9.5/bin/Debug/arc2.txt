@@ -1,0 +1,7 @@
+10.50
+20
+-5.25
+Linea de texto que debe ignorarse
+4.0
+0.0
+Otra línea, 10
