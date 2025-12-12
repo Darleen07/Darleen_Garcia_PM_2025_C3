@@ -1,0 +1,258 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    int id;
+    char marca[30];
+    char modelo[30];
+    int ano;
+    char placa[20];
+    float consumoCiudad;
+    float consumoCarretera;
+    float costoSeguroAnual;
+    float costoCambioKm;
+    int anosDepreciacion;
+    float costoVehiculo;
+    float kmPromedioAnual;
+    float costoLimpieza;
+} Vehiculo;
+
+typedef struct {
+    int id;
+    char nombre[30];
+    float precioLitro;
+} Combustible;
+
+Vehiculo *vehiculos = NULL;
+Combustible *combustibles = NULL;
+int totalVehiculos = 0;
+int totalCombustibles = 0;
+
+// =========================
+// FUNCIONES VEHÍCULOS
+// =========================
+
+void agregarVehiculo() {
+    vehiculos = realloc(vehiculos, sizeof(Vehiculo) * (totalVehiculos + 1));
+    Vehiculo *v = &vehiculos[totalVehiculos];
+
+    v->id = totalVehiculos + 1;
+
+    printf("Marca: "); scanf("%s", v->marca);
+    printf("Modelo: "); scanf("%s", v->modelo);
+    printf("Ano: "); scanf("%d", &v->ano);
+    printf("Placa: "); scanf("%s", v->placa);
+    printf("Consumo ciudad (L/100km): "); scanf("%f", &v->consumoCiudad);
+    printf("Consumo carretera (L/100km): "); scanf("%f", &v->consumoCarretera);
+    printf("Costo seguro anual: "); scanf("%f", &v->costoSeguroAnual);
+    printf("Costo cambio por km: "); scanf("%f", &v->costoCambioKm);
+    printf("Años depreciación: "); scanf("%d", &v->anosDepreciacion);
+    printf("Costo del vehículo: "); scanf("%f", &v->costoVehiculo);
+    printf("Km promedio por año: "); scanf("%f", &v->kmPromedioAnual);
+    printf("Costo limpieza por viaje: "); scanf("%f", &v->costoLimpieza);
+
+    totalVehiculos++;
+    printf("Vehículo agregado con ID %d\n", v->id);
+}
+
+void listarVehiculos() {
+    printf("\n==== LISTA VEHÍCULOS ====\n");
+    for (int i = 0; i < totalVehiculos; i++) {
+        Vehiculo v = vehiculos[i];
+        printf("ID: %d | %s %s | Placa: %s\n", v.id, v.marca, v.modelo, v.placa);
+    }
+}
+
+Vehiculo* buscarVehiculo(int id) {
+    for (int i = 0; i < totalVehiculos; i++) {
+        if (vehiculos[i].id == id) return &vehiculos[i];
+    }
+    return NULL;
+}
+
+void modificarVehiculo() {
+    int id;
+    listarVehiculos();
+    printf("ID a modificar: ");
+    scanf("%d", &id);
+
+    Vehiculo *v = buscarVehiculo(id);
+    if (!v) {
+        printf("No encontrado.\n");
+        return;
+    }
+
+    printf("Marca (%s): ", v->marca); scanf("%s", v->marca);
+    printf("Modelo (%s): ", v->modelo); scanf("%s", v->modelo);
+    printf("Ano (%d): ", v->ano); scanf("%d", &v->ano);
+    printf("Placa (%s): ", v->placa); scanf("%s", v->placa);
+    printf("Consumo ciudad: "); scanf("%f", &v->consumoCiudad);
+    printf("Consumo carretera: "); scanf("%f", &v->consumoCarretera);
+    printf("Costo seguro anual: "); scanf("%f", &v->costoSeguroAnual);
+    printf("Costo cambio por km: "); scanf("%f", &v->costoCambioKm);
+    printf("Años depreciación: "); scanf("%d", &v->anosDepreciacion);
+    printf("Costo vehículo: "); scanf("%f", &v->costoVehiculo);
+    printf("Km promedio anual: "); scanf("%f", &v->kmPromedioAnual);
+    printf("Costo limpieza: "); scanf("%f", &v->costoLimpieza);
+
+    printf("Vehículo modificado.\n");
+}
+
+// =========================
+// FUNCIONES COMBUSTIBLE
+// =========================
+
+void agregarCombustible() {
+    combustibles = realloc(combustibles, sizeof(Combustible) * (totalCombustibles + 1));
+    Combustible *c = &combustibles[totalCombustibles];
+
+    c->id = totalCombustibles + 1;
+
+    printf("Nombre combustible: "); scanf("%s", c->nombre);
+    printf("Precio por litro: "); scanf("%f", &c->precioLitro);
+
+    totalCombustibles++;
+    printf("Combustible agregado con ID %d\n", c->id);
+}
+
+void listarCombustibles() {
+    printf("\n==== LISTA COMBUSTIBLES ====\n");
+    for (int i = 0; i < totalCombustibles; i++) {
+        Combustible c = combustibles[i];
+        printf("ID: %d | %s | $%.2f/L\n", c.id, c.nombre, c.precioLitro);
+    }
+}
+
+Combustible* buscarCombustible(int id) {
+    for (int i = 0; i < totalCombustibles; i++) {
+        if (combustibles[i].id == id) return &combustibles[i];
+    }
+    return NULL;
+}
+
+void modificarCombustible() {
+    int id;
+    listarCombustibles();
+    printf("ID a modificar: ");
+    scanf("%d", &id);
+
+    Combustible *c = buscarCombustible(id);
+    if (!c) {
+        printf("No encontrado.\n");
+        return;
+    }
+
+    printf("Nombre (%s): ", c->nombre); scanf("%s", c->nombre);
+    printf("Precio litro: "); scanf("%f", &c->precioLitro);
+
+    printf("Combustible modificado.\n");
+}
+
+// =========================
+// CÁLCULO DEL VIAJE
+// =========================
+
+void calcularViaje() {
+    if (totalVehiculos == 0 || totalCombustibles == 0) {
+        printf("Debe agregar vehículos y combustibles primero.\n");
+        return;
+    }
+
+    listarVehiculos();
+    int idVeh;
+    printf("\nElija ID vehículo: ");
+    scanf("%d", &idVeh);
+
+    Vehiculo *v = buscarVehiculo(idVeh);
+    if (!v) {
+        printf("Vehículo no encontrado.\n");
+        return;
+    }
+
+    listarCombustibles();
+    int idComb;
+    printf("\nElija ID combustible: ");
+    scanf("%d", &idComb);
+
+    Combustible *c = buscarCombustible(idComb);
+    if (!c) {
+        printf("Combustible no encontrado.\n");
+        return;
+    }
+
+    float kmTotales, porcCiudad;
+    printf("Kilómetros totales: ");
+    scanf("%f", &kmTotales);
+    printf("% de km en ciudad: ");
+    scanf("%f", &porcCiudad);
+
+    float kmCiudad = kmTotales * (porcCiudad / 100.0);
+    float kmCarretera = kmTotales - kmCiudad;
+
+    float litrosCiudad = (kmCiudad * v->consumoCiudad) / 100.0;
+    float litrosCarretera = (kmCarretera * v->consumoCarretera) / 100.0;
+
+    float litrosTotales = litrosCiudad + litrosCarretera;
+    float costoCombustible = litrosTotales * c->precioLitro;
+
+    float depAnual = v->costoVehiculo / v->anosDepreciacion;
+    float costoDepreciacion = (depAnual / v->kmPromedioAnual) * kmTotales;
+
+    float costoSeguro = (v->costoSeguroAnual / v->kmPromedioAnual) * kmTotales;
+    float costoMantenimiento = v->costoCambioKm * kmTotales;
+    float costoLimpieza = v->costoLimpieza;
+
+    float costoTotal = costoCombustible + costoDepreciacion + costoSeguro +
+                       costoMantenimiento + costoLimpieza;
+
+    float costoPorKm = costoTotal / kmTotales;
+
+    printf("\n====== RESULTADOS DEL VIAJE ======\n");
+    printf("Costo combustible: %.2f\n", costoCombustible);
+    printf("Costo depreciacion: %.2f\n", costoDepreciacion);
+    printf("Costo seguro: %.2f\n", costoSeguro);
+    printf("Costo mantenimiento: %.2f\n", costoMantenimiento);
+    printf("Costo limpieza: %.2f\n", costoLimpieza);
+    printf("----------------------------------\n");
+    printf("Costo TOTAL: %.2f\n", costoTotal);
+    printf("Costo por KM: %.2f\n", costoPorKm);
+}
+
+// =========================
+// MENÚ PRINCIPAL
+// =========================
+
+int main() {
+    int opcion;
+
+    do {
+        printf("\n===== MENU COSTO DE VIAJE =====\n");
+        printf("1. Agregar Vehículo\n");
+        printf("2. Listar Vehículos\n");
+        printf("3. Modificar Vehículo\n");
+        printf("4. Agregar Combustible\n");
+        printf("5. Modificar Combustible\n");
+        printf("6. Listar Combustible\n");
+        printf("7. Calcular Viaje\n");
+        printf("0. Salir\n");
+        printf("Seleccione: ");
+
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1: agregarVehiculo(); break;
+            case 2: listarVehiculos(); break;
+            case 3: modificarVehiculo(); break;
+            case 4: agregarCombustible(); break;
+            case 5: modificarCombustible(); break;
+            case 6: listarCombustibles(); break;
+            case 7: calcularViaje(); break;
+        }
+    } while (opcion != 0);
+
+    free(vehiculos);
+    free(combustibles);
+
+    return 0;
+}

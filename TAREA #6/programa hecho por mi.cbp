@@ -1,0 +1,124 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    char nombre[50];
+    float precio;
+    int cantidad;
+} Producto;
+
+// -----------------------------
+// Función para contar productos en archivo
+// -----------------------------
+int contarProductosArchivo(const char *nombreArchivo) {
+    FILE *f = fopen(nombreArchivo, "r");
+    if (!f) return 0;
+
+    int count = 0;
+    Producto temp;
+
+    while (fscanf(f, "%49s %f %d", temp.nombre, &temp.precio, &temp.cantidad) == 3) {
+        count++;
+    }
+
+    fclose(f);
+    return count;
+}
+
+// -----------------------------
+// Leer inventario del archivo en memoria dinámica
+// -----------------------------
+Producto* leerInventario(const char *nombreArchivo, int *total) {
+    *total = contarProductosArchivo(nombreArchivo);
+
+    if (*total == 0) {
+        printf("El archivo está vacío o no existe.\n");
+        return NULL;
+    }
+
+    FILE *f = fopen(nombreArchivo, "r");
+    if (!f) {
+        printf("Error al abrir archivo.\n");
+        return NULL;
+    }
+
+    Producto *inventario = malloc(sizeof(Producto) * (*total));
+    if (!inventario) {
+        printf("Error al asignar memoria.\n");
+        fclose(f);
+        return NULL;
+    }
+
+    for (int i = 0; i < *total; i++) {
+        fscanf(f, "%49s %f %d", inventario[i].nombre, &inventario[i].precio, &inventario[i].cantidad);
+    }
+
+    fclose(f);
+    return inventario;
+}
+
+// -----------------------------
+// Añadir un nuevo producto al archivo
+// -----------------------------
+void agregarProducto(const char *nombreArchivo) {
+    Producto p;
+
+    printf("\nIngrese nombre del producto: ");
+    scanf("%49s", p.nombre);
+
+    printf("Ingrese precio: ");
+    scanf("%f", &p.precio);
+
+    printf("Ingrese cantidad: ");
+    scanf("%d", &p.cantidad);
+
+    FILE *f = fopen(nombreArchivo, "a");
+    if (!f) {
+        printf("Error al abrir archivo.\n");
+        return;
+    }
+
+    fprintf(f, "%s %.2f %d\n", p.nombre, p.precio, p.cantidad);
+    fclose(f);
+
+    printf("Producto añadido correctamente.\n");
+}
+
+// -----------------------------
+// Imprimir productos en memoria
+// -----------------------------
+void imprimirInventario(Producto *inventario, int total) {
+    printf("\n---- INVENTARIO ----\n");
+    for (int i = 0; i < total; i++) {
+        printf("Producto: %s | Precio: %.2f | Cantidad: %d\n",
+               inventario[i].nombre, inventario[i].precio, inventario[i].cantidad);
+    }
+}
+
+// -----------------------------
+// Programa Principal
+// -----------------------------
+int main() {
+    const char *archivo = "inventario.txt";
+    int opcion;
+
+    printf("¿Desea agregar un producto al inventario? (1=Sí / 0=No): ");
+    scanf("%d", &opcion);
+    if (opcion == 1) agregarProducto(archivo);
+
+    printf("\n¿Desea imprimir el inventario? (1=Sí / 0=No): ");
+    scanf("%d", &opcion);
+
+    if (opcion == 1) {
+        int total = 0;
+        Producto *inventario = leerInventario(archivo, &total);
+
+        if (inventario != NULL) {
+            imprimirInventario(inventario, total);
+            free(inventario);
+        }
+    }
+
+    return 0;
+}

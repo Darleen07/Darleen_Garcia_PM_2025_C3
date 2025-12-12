@@ -1,0 +1,5 @@
+15.50 texto
+Linea sin numero
+25.00
+-10.25 otra cosa
+30
